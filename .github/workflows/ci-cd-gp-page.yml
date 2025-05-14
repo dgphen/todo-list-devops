@@ -18,7 +18,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build Docker Image
+      - name: Build and Push Docker Image
         run: |
           docker build -t todo-list-app .
           docker tag todo-list-app:latest deepika268/todo-list-app:latest
@@ -28,5 +28,23 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy App
+      - name: Deploy App (Simulated)
         run: echo "Deployment simulated!"
+
+  deploy-to-gh-pages:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Copy static files
+        run: |
+          mkdir public
+          cp index.html public/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
